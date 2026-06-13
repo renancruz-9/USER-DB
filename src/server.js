@@ -23,12 +23,11 @@ const pool = mysql.createPool({
 app.get('/users', async (req , res) => {
     //async é ua funcao 
     try{
-        const rowd = await pool.query('SELECT * FROM user;');
+        const rows = await pool.query('SELECT * FROM user;');
         res.status(200).json(rows[0])
     }
 
     catch(error){
-
         console.error(error)
         res.status(500).json({msg: 'Erro ao listar usuarios'})
     }
@@ -70,7 +69,14 @@ app.delete('/users/:id', async (req , res) => {
         const rows = await pool.query('DELETE FROM user WHERE id = ?;', //interrogaçao é os parametros que sao injetados 
             [id] // aqui é oque recebe todos parametros quem forem passados com interrogaçao
         ); 
+        if(rows[0].affectedRows == 0) throw new Error("Erro ao deletar usuario")
+        
+            
+        
+
         res.status(200).json({msg: 'Usuario deletado com sucesso'})
+
+       
     }
     catch(error){
 
