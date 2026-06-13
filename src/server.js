@@ -22,54 +22,84 @@ const pool = mysql.createPool({
 
 app.get('/users', async (req , res) => {
     //async é ua funcao 
-    const rows = await pool.query('SELECT * FROM user;');
-    res.status(200).json(rows[0])
+    try{
+        const rowd = await pool.query('SELECT * FROM user;');
+        res.status(200).json(rows[0])
+    }
+
+    catch(error){
+
+        console.error(error)
+        res.status(500).json({msg: 'Erro ao listar usuarios'})
+    }
+
 }) 
 
 app.post('/users', async (req , res) => {
-    const nome = req.body.nome
-    //estamos requirindo todos no body
-    const email = req.body.email
-    const cpf = req.body.cpf
-    const apelido = req.body.apelido ?? null
-    //apelido pode ser nulo esta é uma abreviaçao do ternario
+    
+    try{
+        const nome = req.body.nome
+        //estamos requirindo todos no body
+        const email = req.body.email
 
-    const  result = await pool.query(
-        'INSERT INTO user (nome, email, cpf, apelido) VALUES (?,?,?,?);',
-        //aqui o codigo do mySQL
-        [nome , email , cpf , apelido]
-        //aqui fica os parametros na mesma ordem de cima 
-    )
+        const cpf = req.body.cpf
+        const apelido = req.body.apelido ?? null
+        //apelido pode ser nulo esta é uma abreviaçao do ternario
 
-    res.status(201).json({msg: 'usuario criado com sucesso'})
+        const  result = await pool.query(
+            'INSERT INTO user (nome, email, cpf, apelido) VALUES (?,?,?,?);',
+            //aqui o codigo do mySQL
+
+            [nome , email , cpf , apelido]
+            //aqui fica os parametros na mesma ordem de cima 
+        );
+            
+        res.status(200).json({msg: "Usuario criado com sucesso"})
+
+    } catch(error){
+            console.error(error)
+            res.status(401).json({msg: "Erro ao criar usuario"})
+        }    
 })
 
 app.delete('/users/:id', async (req , res) => {
-    //acima  é definida a rota
-    const id = req.params.id
-    //nso vamos pedir para que o usuario envie a resp por parametros de id no requerimento 
-    const rows = await pool.query('DELETE FROM user WHERE id = ?;', //interrogaçao é os parametros que sao injetados 
-         [id] // aqui é oque recebe todos parametros quem forem passados com interrogaçao
-    )
+    try{
+        //acima  é definida a rota
+        const id = req.params.id
+        //nso vamos pedir para que o usuario envie a resp por parametros de id no requerimento 
+        const rows = await pool.query('DELETE FROM user WHERE id = ?;', //interrogaçao é os parametros que sao injetados 
+            [id] // aqui é oque recebe todos parametros quem forem passados com interrogaçao
+        ); 
+        res.status(200).json({msg: 'Usuario deletado com sucesso'})
+    }
+    catch(error){
 
-    
-    res.status(200).json({msg: 'usuario deletado'})
-    //aqui é onde passa a resposta a msg é oque vai aparece r em json 
-})
+        console.error(error)
+        res.status(400).json({msg: 'Erro ao deletar usuario'})
+        //aqui é onde passa a resposta a msg é oque vai aparece r em json 
+    }
+});
 
 app.put('/users/:id', async (req , res) => {
-    
-    const id = req.params.id
-    //estamos requirindo de id no query la encima 
-   const {nome, email , cpf , apelido} = req.body
-   //estamos pegando os dados e json em body
+    try{
+        const id = req.params.id
+        //estamos requirindo de id no query la encima
 
-   const update = await pool.query('UPDATE user SET nome = ?, email = ?, cpf = ?, apelido = ? WHERE id = ?;',
-    //ensima estamos colocando o comando em mySQL
+         const {nome, email , cpf , apelido} = req.body
+        //estamos pegando os dados e json em body
+
+        const update = await pool.query('UPDATE user SET nome = ?, email = ?, cpf = ?, apelido = ? WHERE id = ?;',
+        //ensima estamos colocando o comando em mySQL
+
         [nome, email , cpf , apelido , id]
-   )
-   res.status(200).json({msg: 'Usuario atualizado com sucesso!!'})
-   
+    );
+         res.status(200).json({msg: 'Usuario atualizado com sucesso'})
+    }
+    catch(error){
+
+        console.error(error)
+        res.status(200).json({msg: 'erro ao atualizar usuario'})
+    }
 })
 
 
