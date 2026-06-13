@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express';
 import mysql from 'mysql2/promise';
 //estamos importando as dependencias 
@@ -7,18 +8,20 @@ app.use(express.json());
 
 const port = 3000;
 
+
 const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-    database: 'user_db',
-    port: 3306,
+    host: process.env.DB_HOST,
+    //AQUI NOS CRIAMOS OUTRA PASTA DO ENV E COLCOAMOS UMA BIBLOTECA
+    //  DESSA E NO POOL EU COLOCO ESSA SINTAXE QUE LIGA COM O OUTRO ARQUIVO
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSOWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
     //aqui é basocamente oque liga agente com  api e banco de dados funciona como um tubo de ligaçao
 })
-
 
 app.get('/users', async (req , res) => {
     //async é ua funcao 
@@ -72,11 +75,8 @@ app.delete('/users/:id', async (req , res) => {
         if(rows[0].affectedRows == 0) throw new Error("Erro ao deletar usuario")
         
             
-        
-
         res.status(200).json({msg: 'Usuario deletado com sucesso'})
-
-       
+        
     }
     catch(error){
 
