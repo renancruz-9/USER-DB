@@ -1,9 +1,13 @@
 import 'dotenv/config'
 import express from 'express';
 import mysql from 'mysql2/promise';
+import  swaggerUi from 'swagger-ui-express'
+import swaggerDocument from './doc/swagger-output.json' with {type: 'json'}
 //estamos importando as dependencias 
 
 const app = express();
+
+app.use('/docs' , swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 app.use(express.json());
 
 const port = 3000;
@@ -47,6 +51,7 @@ app.post('/users', async (req , res) => {
         const cpf = req.body.cpf
         const apelido = req.body.apelido ?? null
         //apelido pode ser nulo esta é uma abreviaçao do ternario
+        
 
         const  result = await pool.query(
             'INSERT INTO user (nome, email, cpf, apelido) VALUES (?,?,?,?);',
@@ -76,7 +81,7 @@ app.delete('/users/:id', async (req , res) => {
         
             
         res.status(200).json({msg: 'Usuario deletado com sucesso'})
-        
+
     }
     catch(error){
 
@@ -89,6 +94,7 @@ app.delete('/users/:id', async (req , res) => {
 app.put('/users/:id', async (req , res) => {
     try{
         const id = req.params.id
+        
         //estamos requirindo de id no query la encima
 
          const {nome, email , cpf , apelido} = req.body
